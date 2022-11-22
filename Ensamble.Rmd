@@ -50,8 +50,8 @@ conda activate bbmap
 Crea tu carpeta y una liga simbólica a los datos:
 
 ```{bash acomodando archivos eval=F}
-mkdir -p 01.Mapeo/{data,results}
-cd 01.Mapeo/
+mkdir -p 02.Mapeo/{data,results}
+cd 02.Mapeo/
 ln -s /ensamble/pulque.fasta data/  
 ln -s /rawreads/pulque_*-corto.fastq  data/ 
 ```
