@@ -3,7 +3,7 @@ title: "Ensamble"
 output: html_document
 date: "2022-11-22"
 ---
-
+ #gdfg
 ### Ensamble
 
 Primero que nada activa el ambiente de megahit.
