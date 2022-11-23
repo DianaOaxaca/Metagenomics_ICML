@@ -3,8 +3,42 @@ title: "Ensamble"
 output: html_document
 date: "2022-11-22"
 ---
- #gdfg
 ### Ensamble
+
+Paso uno... instalar :)
+
+```{bash eval=F}
+conda create -n qc -yc bioconda bbmap trimmomatic samtools fastqc quast
+conda create -n assembly -yc bioconda megahit spades
+```
+
+Si todo a salido bien ahora si podemos empezar.
+
+Una primer cosa que nos gustaria hacer seria ver la calidad de las secuencias a utilizar.
+
+```{bash eval=F}
+fastqc -t 10 SRR.fastq
+```
+
+Vamos a filtrar las lecturas por calidad utilizando [**Trimmomatic**](http://www.usadellab.org/cms/?page=trimmomatic).
+
+```{bash eval=F}
+java -jar trimmomatic-0.39.jar PE -threads 10 -phred33 -trimlog triminfo.txt SRR_R1_001.fastq SRR_R2_001.fastq  SRR_R1_trimm.fastq  SRR_R1_unpair.fastq SRR_R2_trimm.fastq SRR_R2_unpair.fastq ILLUMINACLIP:/home/val/src/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
+```
+
+Ahora vamos a crear un archivo intercalado.
+
+Primero que nada activa el ambiente de bbmap.
+
+```{bash eval=F}
+conda activate bbmap_env
+```
+
+```{bash}
+reformat.sh threads=10 in1=SRR_R1.fastq in2=SRR_R2.fastq out=SRR_HQ.fastq
+```
+
+Bien, ahora si a ensamblar.
 
 Primero que nada activa el ambiente de megahit.
 
