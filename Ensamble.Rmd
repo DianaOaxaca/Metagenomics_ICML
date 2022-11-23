@@ -66,6 +66,12 @@ megahit
 megahit --12 SRR_1.pl.fastq --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o $i.pulque --out-prefix megahit 
 ```
 
+### Calidad de mi ensamble 
+
+```{bash eval=F}
+quast SRR_1.pl.fastq -t 10 -o report
+```
+
 ### Mapeo
 
 **Profundidad**: La profundidad de cada contig se calcula mapeando las lecturas al ensamble. Este paso permite evaluar la calidad del ensamble y es necesario para hacer la reconstrucción de genomas ya que, como veremos más adelante, es uno de los parámetros que toman en cuenta los "bineadores". 
