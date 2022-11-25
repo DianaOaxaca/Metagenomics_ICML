@@ -111,10 +111,10 @@ run_MaxBin.pl -contig pulque.fasta -out maxbin -abund pulque-depth.txt -max_iter
 Okay, vamos a utilizar otro programa. Crea tus ligas simbólicas :)
 
 ```{bash, eval=F}
-mkdir -p 05.Concoct/{data,results}
-cd 05.Concoct/
-ln -s /Ensamble/pulque.fasta data/  
-ln -s /BamFile/pulque_sorted.bam  data/ 
+mkdir -p 09.Concoct/{data,results}
+cd 09.Concoct/
+ln -s $HOME/04.Megahit/SRR10997046.pulque/megahit.contigs.fa data/  
+ln -s $HOME/06.Mapeo/SRR10997046.pulque_sorted.bam  data/ 
 ```
 
 Primero, activemos el ambiente
@@ -126,17 +126,17 @@ conda activate concoct
 Primero, los contigs se tienen que partir en pedazos más pequeños
 
 ```{bash split_assembly, eval=FALSE}
-cut_up_fasta.py pulque.fasta -c 10000 -o 0 --merge_last -b SplitAssembly-pulque.bed > pulque.fasta-split10K.fa
+cut_up_fasta.py $HOME/data/megahit.contigs.fa -c 10000 -o 0 --merge_last -b $HOME/resuls/SplitAssembly-pulque.bed > $HOME/resuls/pulque.fasta-split10K.fa
 ```
 
 Para crear la tabla de cobertura se necesita primero indexar el archivo bam
 
 ```{bash index_bamfile, eval=FALSE}
-samtools index pulque_sorted.bam
+samtools index $HOME/data/SRR10997046.pulque_sorted.bam
 ```
 
 ```{bash create_coverage_table, eval=FALSE}
-concoct_coverage_table.py SplitAssembly-pulque.bed pulque_sorted.bam > concoct_coverage_table_pulque.tsv
+concoct_coverage_table.py $HOME/resuls/SplitAssembly-pulque.bed $HOME/data/SRR10997046.pulque_sorted.bam > $HOME/resuls/concoct_coverage_table_pulque.tsv
 ```
 
 ¡Ahora sí! A correr concoct.
@@ -144,20 +144,20 @@ concoct_coverage_table.py SplitAssembly-pulque.bed pulque_sorted.bam > concoct_c
 Normalmente correríamos 500 iteraciones, pero esta vez sólo haremos una.
 
 ```{bash run_concot, eval=FALSE}
-concoct --coverage_file results/concoct_coverage_table_pulque.tsv --composition_file results/pulque.fasta-split10K.fa --clusters 400 --kmer_length 4 --threads 4 --length_threshold 3000 --basename concot --seed 4 --iterations 1
+concoct --coverage_file $HOME/results/concoct_coverage_table_pulque.tsv --composition_file $HOME/results/pulque.fasta-split10K.fa --clusters 400 --kmer_length 4 --threads 4 --length_threshold 3000 --basename concot --seed 4 --iterations 1
 ```
 
 Combinar contigs
 
 ```{bash merge_step, eval=FALSE}
-merge_cutup_clustering.py concot_clustering_gt3000.csv > results/merged-pulque-gt3000.csv
+merge_cutup_clustering.py $HOME/results/concot_clustering_gt3000.csv > $HOME/results/merged-pulque-gt3000.csv
 ```
 
 Extraer bins como fasta individualmente
 
 ```{bash make_fastafiles, eval=FALSE}
 mkdir results/bins-concot
-extract_fasta_bins.py  data/pulque.fasta results/merged-pulque-gt3000.csv --output_path results/bins-concot
+extract_fasta_bins.py  $HOME/data/pulque.fasta $HOME/results/merged-pulque-gt3000.csv --output_path $HOME/results/bins-concot
 ```
 
 # Discutamos
@@ -171,14 +171,13 @@ https://docs.google.com/document/d/1kEQlFBV4Y42V6x5uth6p9CQLwbUcyeKn37thI4GTMus/
 Preparing input files.
 
 ```{bash, eval=FALSE}
-/home/programs/DAS_Tool-1.1.2/src/Fasta_to_Scaffolds2Bin.sh -i /home/mirna/maxbin -e fasta > pulque_maxbin.scaffolds2bin.tsv
+Fasta_to_Scaffolds2Bin.sh -i maxbin -e fasta > $HOME/10.Dastool/pulque_maxbin.scaffolds2bin.tsv
 
-/home/programs/DAS_Tool-1.1.2/src/Fasta_to_Scaffolds2Bin.sh -i /home/mirna/metabat -e fa > pulque_metabat.scaffolds2bin.tsv
+Fasta_to_Scaffolds2Bin.sh -i metabat -e fa > $HOME/10.Dastool/pulque_metabat.scaffolds2bin.tsv
 ```
 
 ```{bash DAS_default, eval=FALSE}
-PATH=/home/programs:$PATH
-/home/programs/DAS_Tool-1.1.2/DAS_Tool -i pulque_maxbin.contigs2bin.tsv,pulque_metabat.scaffolds2bin.tsv -l maxbin,metabat -c pulque.fasta -o pulque_bins --debug -t 4  --search_engine diamond --write_bins 1 
+DAS_Tool -i pulque_maxbin.contigs2bin.tsv,pulque_metabat.scaffolds2bin.tsv -l maxbin,metabat -c $HOME/04.Megahit/SRR10997046.pulque/megahit.contigs.fa -o pulque_bins --debug -t 4  --search_engine diamond --write_bins 1 
 ```
 
 ### [CheckM](https://github.com/Ecogenomics/CheckM/wiki)
@@ -198,7 +197,7 @@ conda activate checkm
 
 
 ```{bash, eval=FALSE}
-checkm  lineage_wf -t 40 -x fa 03.DASTool/results/pulque_bins_DASTool_bins DAStools-log_pulque  -f CheckM-DAS_Tool_bins.txt
+checkm  lineage_wf -t 40 -x fa $HOME/results/pulque_bins_DASTool_bins DAStools-log_pulque  -f $HOME/CheckM-DAS_Tool_bins.txt
 ```
 
 Vamos a explorar la salida de checkM
@@ -208,7 +207,7 @@ Primero me puedes decir ¿Cuántas lineas tiene tu archivo?
 Okay... ahora vamos a remover esas lineas feas. 
 
 ```{bash, eval=FALSE}
-sed -e '1,3d' CheckM-DAS_Tool_bins.txt | sed -e '37d' >CheckM-DAS_Tool_bins_mod.txt
+sed -e '1,3d' $HOME/CheckM-DAS_Tool_bins.txt | sed -e '37d' > $HOME/CheckM-DAS_Tool_bins_mod.txt
 ```
 
 
