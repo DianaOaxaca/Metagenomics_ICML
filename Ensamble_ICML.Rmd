@@ -7,6 +7,8 @@ date: "2022-11-22"
 
 Paso uno... instalar :)
 
+
+
 ```{bash eval=F}
 conda create -n qc -yc bioconda bbmap trimmomatic samtools fastqc quast
 conda create -n assembly -yc bioconda megahit spades
