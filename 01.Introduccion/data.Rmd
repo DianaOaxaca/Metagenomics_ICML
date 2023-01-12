@@ -3,7 +3,7 @@ title: "Los datos"
 output: html_document
 date: "2022-10-17"
 ---
-#### pulque. 
+#### Pulque. 
 
 **Sinopsis**: En este trabajo se secuenciaron librerias de Illumina MiSeq de muestras a diferentes tiempos de fermentación: 0 hrs (aguamiel), 3, 6 y 12 horas. En general observaron que la abundancia de los géneros cambió durante la fermentación y se asoció con una disminución de sacarosa, aumento de etanol y ácido láctico (Medidos por HPLC). Predijeron, entre otros, la biosíntesis de folato y vitamina B. Uno de los MAG obtenidos correspondió a Saccharomyces cereviseae relacionado filogenéticamente con S. cerevisiae aislado de sake y bioetanol y otro correspondió a Zymomonas mobilis que propusieron como un nuevo linaje.
 

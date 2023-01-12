@@ -1,0 +1,115 @@
+---
+title: "Ensamble"
+output: html_document
+date: "2022-11-22"
+---
+### Ensamble
+
+Paso uno... instalar :)
+
+```{bash eval=F}
+conda create -n qc -yc bioconda bbmap trimmomatic samtools fastqc quast
+conda create -n assembly -yc bioconda megahit spades
+```
+
+Si todo a salido bien ahora si podemos empezar.
+
+Una primer cosa que nos gustaria hacer seria ver la calidad de las secuencias a utilizar.
+
+```{bash eval=F}
+fastqc -t 10 SRR.fastq
+```
+
+Vamos a filtrar las lecturas por calidad utilizando [**Trimmomatic**](http://www.usadellab.org/cms/?page=trimmomatic).
+
+```{bash eval=F}
+java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 10 -phred33 -trimlog triminfo.txt SRR_R1_001.fastq SRR_R2_001.fastq  SRR_R1_trimm.fastq  SRR_R1_unpair.fastq SRR_R2_trimm.fastq SRR_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
+```
+
+Ahora vamos a crear un archivo intercalado.
+
+Primero que nada activa el ambiente de bbmap.
+
+```{bash eval=F}
+conda activate bbmap_env
+```
+
+```{bash}
+reformat.sh threads=10 in1=SRR_R1.fastq in2=SRR_R2.fastq out=SRR_HQ.fastq
+```
+
+Bien, ahora si a ensamblar.
+
+Primero que nada activa el ambiente de megahit.
+
+```{bash  eval=F}
+conda activate megahit
+```
+
+```{bash eval=F}
+mkdir 01.Ensamble
+cd 01.Ensamble
+```
+
+Crea ligas simbolicas a los archivos fastq que vamos a utilizar para ensamblar. 
+
+¡Ahora si!
+
+Explora la ayuda y segun tu experiencia que parametros se deberian utilizar?  
+
+```{bash eval=F}
+megahit
+```
+
+
+```{bash eval=F}
+megahit --12 SRR_1.pl.fastq --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o $i.pulque --out-prefix megahit 
+```
+
+### Calidad del ensamble 
+
+```{bash eval=F}
+quast SRR_1.pl.fastq -t 10 -o report
+```
+
+### Mapeo
+
+**Profundidad**: La profundidad de cada contig se calcula mapeando las lecturas al ensamble. Este paso permite evaluar la calidad del ensamble y es necesario para hacer la reconstrucción de genomas ya que, como veremos más adelante, es uno de los parámetros que toman en cuenta los "bineadores". 
+
+Vamos a mapear utilizando la herramienta BBMap del programa **[BBtools](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/)**. Y [**samtools**](http://www.htslib.org/doc/samtools.html). 
+
+**¡Manos a la obra!**
+
+Primero que nada activa el ambiente e samtools y bbmap:
+
+```{bash  eval=F}
+conda activate samtools
+conda activate bbmap
+```
+
+Crea tu carpeta y una liga simbólica a los datos:
+
+```{bash acomodando archivos eval=F}
+mkdir -p 02.Mapeo/{data,results}
+cd 02.Mapeo/
+ln -s /ensamble/pulque.fasta data/  
+ln -s /rawreads/pulque_*-corto.fastq  data/ 
+```
+
+Ahora ¡sí! explora las opciones de bbmap, y vamos a hacer nuestro primer mapeo.
+
+```{bash mapeando eval=F}
+bbmap.sh ref=pulque.fasta in1=pulque_1-corto.fastq in2=pulque_2-corto.fastq out=pulque.sam kfilter=22 subfilter=15 maxindel=80 threads=4
+```
+
+```{bash creando bam file eval=F}
+cd results
+samtools view -bShu pulque.sam | samtools sort -@ 5 -o pulque_sorted.bam
+samtools index pulque_sorted.bam
+```
+
+# Discutamos
+
+https://docs.google.com/document/d/1kEQlFBV4Y42V6x5uth6p9CQLwbUcyeKn37thI4GTMus/edit?usp=sharing
+
+
