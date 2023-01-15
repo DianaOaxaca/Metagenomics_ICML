@@ -61,12 +61,12 @@ mkdir $HOME/02.Trimmomatic
 ```
 
 ```{bash eval=F}
-java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 -phred33 -trimlog $HOME/02.Trimmomatic/triminfo.txt $HOME/00.RawData/SRR10997046_1.fastq $HOME/00.RawData/SRR10997046_2.fastq  $HOME/02.Trimmomatic/SRR10997046_R1_trimm.fastq  $HOME/02.Trimmomatic/SRR10997046_R1_unpair.fastq $HOME/02.Trimmomatic/SRR10997046_R2_trimm.fastq $HOME/02.Trimmomatic/SRR10997046_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
+java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 -phred33 -trimlog $HOME/02.Trimmomatic/triminfo.txt $HOME/00.RawData/SRR10997048_1.fastq $HOME/00.RawData/SRR10997048_2.fastq  $HOME/02.Trimmomatic/SRR10997048_R1_trimm.fastq  $HOME/02.Trimmomatic/SRR10997048_R1_unpair.fastq $HOME/02.Trimmomatic/SRR10997048_R2_trimm.fastq $HOME/02.Trimmomatic/SRR10997048_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
 ```
 * Hacer una liga simbólica a los resultados de las otras muestras?????*
 
 ```{bash eval=F}
-ln -s /databases/material_curso_2023/03.Interleave/*.fastq .
+ln -s /databases/material_curso_2023/02.Trimmomatic/*_trimm.fastq .
 ```
 
 Ahora vamos a crear un archivo intercalado.
@@ -76,7 +76,7 @@ mkdir $HOME/03.Interleave
 ```
 
 ```{bash}
-/opt/anaconda3/bin/reformat.sh threads=10 in1=02.Trimmomatic/SRR10997046_R1_trimm.fastq in2=02.Trimmomatic/SRR10997046_R2_trimm.fastq out=03.Interleave/SRR10997046_HQ.fastq
+/opt/anaconda3/bin/reformat.sh threads=10 in1=02.Trimmomatic/SRR10997048_R1_trimm.fastq in2=02.Trimmomatic/SRR10997048_R2_trimm.fastq out=03.Interleave/SRR10997048_HQ.fastq
 ```
 
 Bien, ahora si a ensamblar.
