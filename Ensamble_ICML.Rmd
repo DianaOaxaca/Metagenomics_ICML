@@ -3,30 +3,66 @@ title: "Ensamble"
 output: html_document
 date: "2022-11-22"
 ---
-### Ensamble
+### Filtrado de lecturas
 
-Paso uno... instalar :)
-
-
+La primer cosa que tenemos que hacer es crear una carpeta donde van a vivir los datos que vamos a trabajar durante el curso.
 
 ```{bash eval=F}
-conda create -n qc -yc bioconda bbmap trimmomatic samtools fastqc quast
-conda create -n assembly -yc bioconda megahit spades
+mkdir $HOME/00.RawData
 ```
 
-Si todo a salido bien ahora si podemos empezar.
-
-Una primer cosa que nos gustaria hacer seria ver la calidad de las secuencias a utilizar.
+Ahora creemos una liga simbolica al lugar a donde viven los datos.
 
 ```{bash eval=F}
-fastqc -t 10 SRR.fastq
+ln -s /databases/material_curso_2023/00.RawReads/* $HOME/00.RawData
 ```
+
+Muy bien!
+
+Una primer cosa que nos gustaria hacer seria ver la calidad de las secuencias a utilizar, para eso vamos a analizar la calidad de las lecturad con fastqc.
+
+Entonces vamos a crear un nuevo directorio donde van a vivir los resultados de fastqc.
+
+```{bash eval=F}
+mkdir $HOME/01.Fastq
+```
+
+Y ahora vamos a correr el programa.
+
+```{bash eval=F}
+fastqc -t 4 $HOME/00.RawData/*.fastq 
+```
+
+Okay ahora vamos a pasar los resultados a nuestras computadoras para ver los reportes de calidad. 
+
+Abramos una terminal nueva vamos a nuestro directorio de escritorio dentro de nuestras computadoras
+
+```{bash eval=F}
+cd $HOME/Desktop/
+```
+
+Y ahora copiemos los archivos
+
+```{bash eval=F}
+scp -P Numero_de_puerto usuario@IP:/rurta/a/mi/archivo .
+```
+
+Muy bien!
+
+Ahora vamos a filtrar las secuencias usando trimomatic
 
 Vamos a filtrar las lecturas por calidad utilizando [**Trimmomatic**](http://www.usadellab.org/cms/?page=trimmomatic).
 
+
 ```{bash eval=F}
-java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 10 -phred33 -trimlog triminfo.txt SRR_R1_001.fastq SRR_R2_001.fastq  SRR_R1_trimm.fastq  SRR_R1_unpair.fastq SRR_R2_trimm.fastq SRR_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
+mkdir $HOME/02.Trimmomatic
 ```
+
+```{bash eval=F}
+java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 -phred33 -trimlog $HOME/02.Trimmomatic/triminfo.txt $HOME/00.RawData/SRR10997046_1.fastq $HOME/00.RawData/SRR10997046_2.fastq  $HOME/02.Trimmomatic/SRR10997046_trimm.fastq  $HOME/02.Trimmomatic/SRR10997046_R1_unpair.fastq $HOME/02.Trimmomatic/SRR10997046_R2_trimm.fastq SRR10997046_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
+```
+
+Ahora observa con tu equipo los archivos html y define los parametros para trimmear tus secuencias.
 
 Ahora vamos a crear un archivo intercalado.
 
