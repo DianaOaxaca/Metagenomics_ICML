@@ -63,39 +63,45 @@ mkdir $HOME/02.Trimmomatic
 ```{bash eval=F}
 java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 -phred33 -trimlog $HOME/02.Trimmomatic/triminfo.txt $HOME/00.RawData/SRR10997046_1.fastq $HOME/00.RawData/SRR10997046_2.fastq  $HOME/02.Trimmomatic/SRR10997046_R1_trimm.fastq  $HOME/02.Trimmomatic/SRR10997046_R1_unpair.fastq $HOME/02.Trimmomatic/SRR10997046_R2_trimm.fastq $HOME/02.Trimmomatic/SRR10997046_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
 ```
+* Hacer una liga simbólica a los resultados de las otras muestras?????*
+
+```{bash eval=F}
+ln -s /databases/material_curso_2023/03.Interleave/*.fastq .
+```
 
 Ahora vamos a crear un archivo intercalado.
 
+```{bash eval=F}
+mkdir $HOME/03.Interleave
+```
+
 ```{bash}
-/opt/anaconda3/bin/reformat.sh threads=10 in1=SRR_R1.fastq in2=SRR_R2.fastq out=SRR_HQ.fastq
+/opt/anaconda3/bin/reformat.sh threads=10 in1=02.Trimmomatic/SRR10997046_R1_trimm.fastq in2=02.Trimmomatic/SRR10997046_R2_trimm.fastq out=03.Interleave/SRR10997046_HQ.fastq
 ```
 
 Bien, ahora si a ensamblar.
 
-Primero que nada activa el ambiente de megahit.
-
-```{bash  eval=F}
-conda activate megahit
-```
-
 ```{bash eval=F}
-mkdir 03.Ensamble
-cd 03.Ensamble
+mkdir 04.Ensamble
+cd 04.Ensamble
 ```
 
 Crea ligas simbólicas a los archivos fastq que vamos a utilizar para ensamblar. 
 
+```{bash eval=F}
+ln -s /databases/material_curso_2023/03.Interleave/*.fastq .
+```
+
 ¡Ahora si!
 
-Explora la ayuda y según tu experiencia que parametros se deberian utilizar?  
+Explora la ayuda y según tu experiencia qué parámetros se deberían utilizar?  
 
 ```{bash eval=F}
 megahit
 ```
 
-
 ```{bash eval=F}
-megahit --12 SRR_1.pl.fastq --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o $i.pulque --out-prefix megahit 
+/opt/anaconda3/pkgs/megahit-1.2.9-h2e03b76_1/bin/megahit --12 SRR10997046_HQ.fastq,SRR10997047_HQ.fastq,SRR10997048_HQ.fastq,SRR10997049_HQ.fastq,SRR10997050_HQ.fastq  --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o pulque --out-prefix megahit
 ```
 
 ### Calidad del ensamble 
