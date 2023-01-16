@@ -11,35 +11,6 @@ Utilizaremos varios programas para hacer la reconstrucción de los genomas y har
 
 La presente práctica sólo es una representación del flujo de trabajo, sin embargo, no sustituye los manuales de cada programa y el flujo puede variar dependiendo del tipo de datos y pregunta de investigación.
 
-Paso uno... instalar :)
-
-```{bash eval=F}
-conda create -n dastool -yc bioconda -c conda-forge das_tool
-conda create -n metabat2 -yc bioconda metabat2
-conda create -n maxbin2 -yc bioconda maxbin2
-```
-
-Para acelerar las cosas usaremos mamba ya que estos programas tienen demasiadas dependencias
-
-```{bash eval=F}
-conda install -yc conda-forge mamba
-
-wget https://raw.githubusercontent.com/chklovski/CheckM2/main/checkm2.yml
-conda env create -n checkm2 -f checkm2.yml
-rm checkm2.yml
-conda activate checkm2
-
-conda create -n checkm -yc bioconda checkm-genome
-conda create -n concoct -yc bioconda concoct
-```
-
-Y se eliminan los archivos temporales
-
-```{bash eval=F}
-conda clean --all -y
-```
-
-Si todo a salido bien ahora si podemos empezar.
 
 ### [MetaBat](https://bitbucket.org/berkeleylab/metabat/src/master/)
 
@@ -54,11 +25,6 @@ ln -s /BamFile/pulque_sorted.bam  data/
 
 Para MetaBat lo primero que tenemos que hacer es crear un archivo de profundidad utilizando el script **jgi_summarize_bam_contig_depths**.
 
-Entonces, primero activamos el ambiente.
-
-```{bash, eval=FALSE}
-conda activate metabat_env
-```
 
 Como cualquier otro programa **jgi_summarize_bam_contig_depths** tiene opciones, podemos revisarlas. 
 
