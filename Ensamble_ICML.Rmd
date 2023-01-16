@@ -3,7 +3,7 @@ title: "Ensamble"
 output: html_document
 date: "2022-11-22"
 ---
-### Filtrado de lecturas
+## Filtrado de lecturas
 
 La primer cosa que tenemos que hacer es crear una carpeta donde van a vivir los datos que vamos a trabajar durante el curso.
 
@@ -14,14 +14,15 @@ mkdir $HOME/00.RawData
 Ahora creemos una liga simbólica al lugar a donde viven los datos.
 
 ```{bash eval=F}
-ln -s /databases/material_curso_2023/00.RawReads/* $HOME/00.RawData
+ln -s /botete/databases/material_curso_2023/00.RawReads/* $HOME/00.RawData
 ```
 
-Muy bien!
+¡Muy bien!
 
-Una primer cosa que nos gustaría hacer sería ver la calidad de las secuencias a utilizar, para eso vamos a analizar la calidad de las lecturas con fastqc.
+Una primera cosa que nos gustaría hacer sería ver la calidad de las secuencias a utilizar, para eso vamos a analizar la calidad de las lecturas con  [**fastqc**](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
 Entonces vamos a crear un nuevo directorio donde van a vivir los resultados de fastqc.
+
 
 ```{bash eval=F}
 mkdir $HOME/01.Fastqc
@@ -35,7 +36,7 @@ fastqc -t 4 $HOME/00.RawData/*.fastq -o $HOME/01.Fastqc
 
 Okay ahora vamos a pasar los resultados a nuestras computadoras para ver los reportes de calidad. 
 
-Abramos una terminal nueva vamos a nuestro directorio de escritorio dentro de nuestras computadoras
+Abramos una terminal nueva y vamos a nuestro directorio de escritorio dentro de nuestras computadoras:
 
 ```{bash eval=F}
 cd $HOME/Desktop/
@@ -47,22 +48,25 @@ Y ahora copiemos los archivos
 scp -P Numero_de_puerto usuario@IP:/ruta/a/mi/archivo .
 ```
 
-Ahora observa con tu equipo los archivos html y define los parametros para trimmear tus secuencias.
+¡Muy bien!
 
-Muy bien!
-
-Ahora vamos a filtrar las secuencias usando trimomatic
+Ahora vamos a filtrar las secuencias usando Trimmomatic
 
 Vamos a filtrar las lecturas por calidad utilizando [**Trimmomatic**](http://www.usadellab.org/cms/?page=trimmomatic).
 
+Vamos a crear un directorio de salida.
 
 ```{bash eval=F}
 mkdir $HOME/02.Trimmomatic
 ```
 
+Y ahora vamos a correr el programa.
+
 ```{bash eval=F}
 java -jar /opt/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 4 -phred33 -trimlog $HOME/02.Trimmomatic/triminfo.txt $HOME/00.RawData/SRR10997048_1.fastq $HOME/00.RawData/SRR10997048_2.fastq  $HOME/02.Trimmomatic/SRR10997048_R1_trimm.fastq  $HOME/02.Trimmomatic/SRR10997048_R1_unpair.fastq $HOME/02.Trimmomatic/SRR10997048_R2_trimm.fastq $HOME/02.Trimmomatic/SRR10997048_R2_unpair.fastq ILLUMINACLIP:/opt/Trimmomatic-0.39/adapters/TruSeq2-PE.fa:2:30:10:8:True LEADING:5 TRAILING:5 SLIDINGWINDOW:5:15 MINLEN:50
 ```
+
+Ahora en equipos definan los parámetros para el resto de las secuencias hagan el filtrado y veamos finalmente los archivos de salida.
 
 Ahora vamos a crear un archivo intercalado.
 
@@ -74,36 +78,48 @@ mkdir $HOME/03.Interleave
 /opt/anaconda3/bin/reformat.sh threads=10 in1=02.Trimmomatic/SRR10997048_R1_trimm.fastq in2=02.Trimmomatic/SRR10997048_R2_trimm.fastq out=03.Interleave/SRR10997048_HQ.fastq
 ```
 
+## Ensamble
+
 Bien, ahora si a ensamblar.
 
 ```{bash eval=F}
-mkdir 04.Ensamble
-cd 04.Ensamble
+mkdir  $HOME/04.Ensamble
 ```
 
 Crea ligas simbólicas a los archivos fastq que vamos a utilizar para ensamblar. 
 
 ```{bash eval=F}
-ln -s $HOME/03.Interleave/SRR10997048_HQ.fastq .
+ln -s $HOME/03.Interleave/SRR10997048_HQ.fastq  $HOME/04.Ensamble
 ```
 
 ¡Ahora si!
 
-Explora la ayuda y según tu experiencia qué parámetros se deberían utilizar?  
+Ahora vamos a utilizar conda.
+
+```{bash eval=F}
+conda env list
+```
+
+
+```{bash eval=F}
+conda activate megahit
+```
+
+Explora la ayuda y según tu experiencia qué parámetros se deberían utilizar.
 
 ```{bash eval=F}
 megahit
 ```
 
 ```{bash eval=F}
-/opt/anaconda3/pkgs/megahit-1.2.9-h2e03b76_1/bin/megahit --12 SRR10997048_HQ.fastq  --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o SRR10997048 --out-prefix SRR10997048_megahit
+/opt/anaconda3/pkgs/megahit-1.2.9-h2e03b76_1/bin/megahit --12 $HOME/04.Ensamble/SRR10997048_HQ.fastq  --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o $HOME/04.Ensamble/SRR10997048 --out-prefix SRR10997048_megahit
 
 ## Ensamblamos una muestra, pero podríamos hacer un ensamble que incluya todas las muestras. Ejemplo:
 #/opt/anaconda3/pkgs/megahit-1.2.9-h2e03b76_1/bin/megahit --12 SRR10997046_HQ.fastq,SRR10997047_HQ.fastq,SRR10997048_HQ.fastq,SRR10997049_HQ.fastq,SRR10997050_HQ.fastq  --k-list 21,33,55,77,99,121 --min-count 2 --verbose -t 10 -o pulque --out-prefix megahit
 ```
 
 
-### Mapeo
+## Mapeo
 
 **Profundidad**: La profundidad de cada contig se calcula mapeando las lecturas al ensamble. Este paso permite evaluar la calidad del ensamble y es necesario para hacer la reconstrucción de genomas ya que, como veremos más adelante, es uno de los parámetros que toman en cuenta los "bineadores". 
 
